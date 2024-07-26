@@ -3,6 +3,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+//no google translate here idc
+//coefficients from random site, i'll add (r+g+b)/3  later
 
 unsigned char fbrightness (unsigned char r, unsigned char g, unsigned char b)
 {
@@ -37,7 +39,7 @@ int main()
         file_path[enter_i] = enter;
         scanf("%c", &enter);
     }
-    file_path[enter_i] = '\0';
+    file_path[enter_i] = '\0';  //idk is this needed lol
 
     printf("%s\n", file_path);
 
@@ -67,7 +69,7 @@ int main()
 
     if(n != 3 && n != 4){printf("Unsupported file in this version of program. Please, check the program is up to date.\n");printf("Enter anything to close console.\n");char w;scanf(" %c",&w);return 0;}
 
-    printf("Do you want reverse colors of the image? y/n\n\n");
+    printf("Do you want reverse colors of the image? y/n\n\n"); //here u r actually choose brightness function
     char reverse_;
     unsigned char (*pointer) (unsigned char , unsigned char , unsigned char );
     fflush(stdin);
@@ -76,7 +78,7 @@ int main()
     {
         case 'y': pointer = &r_fbrightness;break;
         case 'n': pointer = &fbrightness;break;
-        default: printf("Wrong input.");return 0;
+        default: printf("Wrong input.\n");printf("Enter anything to close console.\n");char w;scanf(" %c",&w);return 0;
     }
 
     printf("Enter integer coefficient of resolution reduction (or 1 to save original size of image).\n\n");
@@ -95,10 +97,11 @@ int main()
         finy = y / coeff;
         int memory_int = finx * finy;
         image = (unsigned char*)malloc(sizeof(unsigned char)*n*memory_int);
-         //c1 пробегает пиксели в строке
-         //c2 пробегает строки в гиперпикселе
-         //c3 пробегает гиперпиксели
-         //c4 пробегает строки гиперпикселей в изображении
+         //pixel++ is kind of square made from pixels
+         //c1 for pixels in strings oh pixels++
+         //c2 for strings in pixels++
+         //c3 for pixels++ in string++
+         //c4 for strings++
         int r;
         int g;
         int b;
@@ -128,19 +131,19 @@ int main()
      }
 
     FILE* output = fopen("output.txt", "wb");
-
+    //chars alphabet
     const char* c1 = "\xE2\x96\x88";
     const char* c2 = "\xE2\x96\x91";
     const char* c3 = "\xE2\x96\x92";
     const char* c4 = "\xE2\x96\x93";
 
-    fputs("\xEF\xBB\xBF", output);
-
+    fputs("\xEF\xBB\xBF", output); //.txt: ASCI -> UTF-8
+    //pixel -> char
     for(int i = 0; i < finy; i++)
     {
         for(int j = 0; j <= finx; j ++)
         {
-            switch(pointer(image[((finx*i) + j)*n], image[(((finx*i) + j)*n)+1], image[(((finx*i) + j)*n)+2]))
+            switch(pointer(image[((finx*i) + j)*n], image[(((finx*i) + j)*n)+1], image[(((finx*i) + j)*n)+2]))   //pointer is chosen function, all creepy shit because of ++ instead of +=n
             {
                 case 0:
                     putc(' ', output); putc(' ', output);
