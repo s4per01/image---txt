@@ -107,11 +107,11 @@ int main()
         int b;
         for(int c4 = 0; c4 < finy; c4++)
         {
-            for(int c3 = 0; c3 < finx ; c3++) //формирование конечного массива
+            for(int c3 = 0; c3 < finx ; c3++)
             {
-                for(int c2 = 0; c2 < coeff; c2++)  //полупиксели отдают значение в полноценный пиксель
+                for(int c2 = 0; c2 < coeff; c2++)
                 {
-                    for(int c1 = 0; c1 < coeff; c1++)  //строки пикселей отдают значение длинному недопикселю, из которых потом квадратный пиксель сделается
+                    for(int c1 = 0; c1 < coeff; c1++)
                     {
                         r += raw_image[(c4*n*x*coeff) + (c3*n*coeff) + (c2*x*n) + (c1*n)];
                         g += raw_image[(c4*n*x*coeff) + (c3*n*coeff) + (c2*x*n) + (c1*n) + 1];
