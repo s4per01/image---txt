@@ -1,29 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 //no google translate here idc
-//coefficients from random site, i'll add (r+g+b)/3  later
-
-unsigned char fbrightness (unsigned char r, unsigned char g, unsigned char b)
+//Ñaitlin <3<3<3<3<3<3<3<3<3<3<3<3<3 (she helped me w brightness func)
+double fbrightness (unsigned char ir, unsigned char ig, unsigned char ib)  // ir - input red
 {
-    float bg = 0.59f * g;
-    float br = 0.3f * r;
-    float bb = 0.11f * b;
-    unsigned char answer = (unsigned char)(bg + br + bb);
-    answer = answer / 32;
-    return answer;
+    //1st step
+    double r = (double)ir / 255;
+    double g = (double)ig / 255;
+    double b = (double)ib / 255;
+    //2nd step
+    if(r > 0.04045)
+    {
+        r =  pow(((r + 0.055) / 1.055), 2.4);
+    }
+    else
+    {
+        r = r / 12.92;
+    }
+    if(g > 0.04045)
+    {
+        g =  pow(((g + 0.055) / 1.055), 2.4);
+    }
+    else
+    {
+        g = g / 12.92;
+    }
+    if(b > 0.04045)
+    {
+        b =  pow(((b + 0.055) / 1.055), 2.4);
+    }
+    else
+    {
+        b = b / 12.92;
+    }
+    //3rd step
+    double x = ((r * 0.4124564) + (g * 0.3575761) + (b * 0.1804375));
+    double y = ((r * 0.2126729) + (g * 0.7151522) + (b * 0.0721750));
+    double z = ((r * 0.0193339) + (g * 0.1191920) + (b * 0.9503041));
+    return sqrt((x*x)+(y*y)+(z*z));
 }
 
-unsigned char r_fbrightness (unsigned char r, unsigned char g, unsigned char b)
+double r_fbrightness (unsigned char ir, unsigned char ig, unsigned char ib)
 {
-    float bg = 0.59f * g;
-    float br = 0.3f * r;
-    float bb = 0.11f * b;
-    unsigned char answer = 255 - (unsigned char)(bg + br + bb);
-    answer = answer / 32;
-    return answer;
+    return fbrightness((255 - ir), (255 - ig), (255 - ib));
 }
 
 int main()
@@ -41,8 +64,6 @@ int main()
     }
     file_path[enter_i] = '\0';  //idk is this needed lol
 
-    printf("%s\n", file_path);
-
     int x, y, n;
 
     bool format_check = stbi_info(file_path, &x, &y, &n);
@@ -52,7 +73,8 @@ int main()
         printf("Invalid path or format of file.\n");
         printf("Enter anything to close console.\n");
         char w;
-        scanf(" %c",&w);
+        fflush(stdin);
+        scanf("%c",&w);
         return 0;
     }
 
@@ -63,22 +85,31 @@ int main()
         printf("Image loading failed.\n");
         printf("Enter anything to close console.\n");
         char w;
-        scanf(" %c",&w);
+        fflush(stdin);
+        scanf("%c",&w);
         return 0;
     }
 
-    if(n != 3 && n != 4){printf("Unsupported file in this version of program. Please, check the program is up to date.\n");printf("Enter anything to close console.\n");char w;scanf(" %c",&w);return 0;}
+    if(n != 3 && n != 4){printf("Unsupported file in this version of program. Please, check the program is up to date.\n");printf("Enter anything to close console.\n");char w;fflush(stdin);scanf("%c",&w);return 0;}
 
-    printf("Do you want reverse colors of the image? y/n\n\n"); //here u r actually choose brightness function
+    printf("Do you want reverse colors of the image? y/n\n\n");
     char reverse_;
-    unsigned char (*pointer) (unsigned char , unsigned char , unsigned char );
+    double (*pointer) (unsigned char , unsigned char , unsigned char );
     fflush(stdin);
     scanf("%c", &reverse_);
     switch(reverse_)
     {
-        case 'y': pointer = &r_fbrightness;break;
-        case 'n': pointer = &fbrightness;break;
-        default: printf("Wrong input.\n");printf("Enter anything to close console.\n");char w;scanf(" %c",&w);return 0;
+        case 'y':
+        {
+            pointer = &r_fbrightness;
+            break;
+        }
+        case 'n':
+        {
+            pointer = &fbrightness;
+            break;
+        }
+        default: printf("Wrong input.\n");printf("Enter anything to close console.\n");char w;fflush(stdin);scanf("%c",&w);return 0;
     }
 
     printf("Enter integer coefficient of resolution reduction (or 1 to save original size of image).\n\n");
@@ -139,45 +170,54 @@ int main()
 
     fputs("\xEF\xBB\xBF", output); //.txt: ASCI -> UTF-8
     //pixel -> char
-    for(int i = 0; i < finy; i++)
-    {
-        for(int j = 0; j <= finx; j ++)
+        for(int i = 0; i < finy; i++)
         {
-            switch(pointer(image[((finx*i) + j)*n], image[(((finx*i) + j)*n)+1], image[(((finx*i) + j)*n)+2]))   //pointer is chosen function, all creepy shit because of ++ instead of +=n
+            for(int j = 0; j <= finx; j ++)
             {
-                case 0:
+                //pb means pixel brightness
+                double pb = pointer(image[((finx*i) + j)*n], image[(((finx*i) + j)*n)+1], image[(((finx*i) + j)*n)+2]); //pointer is chosen function, all creepy shit because of ++ instead of +=n
+                if(pb < 0.219692)  //(max value of fbrightness / 8) (cuz we have 8 chars)
+                {
                     putc(' ', output); putc(' ', output);
-                    break;
-                case 1:
+                }
+                else if (pb < 0.439384)
+                {
                     putc('-', output); putc('-', output);
-                    break;
-                case 2:
+                }
+                else if (pb < 0.659077)
+                {
                     putc('/', output); putc('/', output);
-                    break;
-                case 3:
-                    putc('#', output); putc('#', output);
-                    break;
-                case 4:
+                }
+                else if (pb < 0.878769)
+                {
                     fputs(c1, output); fputs(c1, output);
-                    break;
-                case 5:
+                }
+                else if (pb < 1.098461)
+                {
+                    putc('#', output); putc('#', output);
+                }
+                else if (pb < 1.318154)
+                {
                     fputs(c2, output); fputs(c2, output);
-                    break;
-                case 6:
+                }
+                else if (pb < 1.537846)
+                {
                     fputs(c3, output); fputs(c3, output);
-                    break;
-                case 7:
+                }
+                else
+                {
                     fputs(c4, output); fputs(c4, output);
-                    break;
+                }
             }
+            putc('\n', output);
         }
-        putc('\n', output);
-    }
 
     free(image);
     fclose(output);
     printf("Success. Enter anything to close console.\n");
     char w;
-    scanf(" %c",&w);
+    fflush(stdin);
+    scanf("%c",&w);
+
     return 0;
 }
