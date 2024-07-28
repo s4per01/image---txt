@@ -5,7 +5,8 @@ User guide:
  4. Open .exe file.
  5. Follow instructions in console.
 
- Supported formats of images: .jpg, .png, .bmp, .tga, .jpeg, .psd, .gif (only the first frame), .hdr, .pic
+ Supported formats of images: .jpg, .png, .bmp, .tga, .jpeg, .psd, .gif (only the first frame), .hdr, .pic   
+ File names consisting of English characters and spaces are supported.
 
  Feedback:      
  Telegram: @Failman        
